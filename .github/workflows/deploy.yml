@@ -20,13 +20,7 @@ jobs:
           KEY: ${{ secrets.EC2_SSH_KEY }}
           PROJECT_DIR: "/home/${{ secrets.EC2_USER }}/node_project"
         run: |
-          echo "$KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << 'EOF'
-            if [ ! -d "$PROJECT_DIR" ]; then
-              git clone https://github.com/Dhruvkhalasi/node_project.git $PROJECT_DIR
-            fi
             cd $PROJECT_DIR
             git pull origin main
             npm install
             pm2 restart app || pm2 start app.js --name app
-          EOF
