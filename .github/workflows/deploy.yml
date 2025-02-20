@@ -18,9 +18,8 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
           KEY: ${{ secrets.EC2_SSH_KEY }}
-          PROJECT_DIR: "/home/${{ secrets.EC2_USER }}/node_project"
         run: |
-            cd $PROJECT_DIR
+            cd /home/ubuntu/node_project
             git pull origin main
             npm install
             pm2 restart app || pm2 start app.js --name app
