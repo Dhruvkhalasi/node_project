@@ -1,0 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
+          KEY: ${{ secrets.EC2_SSH_KEY }}
+          PROJECT_DIR: "/home/${{ secrets.EC2_USER }}/app"
+        run: |
+          echo "$KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << 'EOF'
+            if [ ! -d "$PROJECT_DIR" ]; then
+              git clone https://github.com/your-username/your-repo.git $PROJECT_DIR
+            fi
+            cd $PROJECT_DIR
+            git pull origin main
+            npm install
+            pm2 restart app || pm2 start index.js --name app
+          EOF
